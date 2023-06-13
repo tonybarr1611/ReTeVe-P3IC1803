@@ -4,6 +4,7 @@ from tkinter import messagebox as MessageBox
 from PIL import Image, ImageTk
 import sv_ttk
 import os
+from modules.programar_citas import programar_citas
 
 # Función principal de la ventana principal
 def main(ventana):
@@ -22,7 +23,7 @@ def main(ventana):
     logo_label.place(x= 160, y= 50)
 
     # Botones
-    boton_programar = Button(ventana, text="Programar citas", command=lambda: print("Programar citas"), bg="#CFC9F2", height=2, width=30)
+    boton_programar = Button(ventana, text="Programar citas", command=programar_citas, bg="#CFC9F2", height=2, width=30)
     boton_programar.place(relx= 0.5, y= 200, anchor=N)
     
     boton_cancelar = Button(ventana, text="Cancelar citas", command=lambda: print("Cancelar citas"), bg="#0A6AA6", height=2, width=30)
