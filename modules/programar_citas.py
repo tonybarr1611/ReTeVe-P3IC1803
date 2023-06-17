@@ -2,6 +2,8 @@ from tkinter import *
 from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox as MessageBox
+from verify_email import verify_email
+from datetime import datetime
 
 def programar_citas():
     # Clase nodo para guardar las citas en un arbol binario
@@ -82,7 +84,10 @@ def programar_citas():
             telefono = telefono_entry.get()
             correo = correo_entry.get()
             direccion = direccion_entry.get()
-            fecha = fecha_entry.get()
+            fecha_year = int(fecha_year_entry.get())
+            fecha_month = int(fecha_month_entry.get())
+            fecha_day = int(fecha_day_entry.get())
+            fecha = datetime(year=fecha_year, month=fecha_month, day=fecha_day)
             
             programador.insertar_cita(numero_cita, tipo_cita, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha)
             programador.aumentar_contador_cita()
@@ -112,11 +117,13 @@ def programar_citas():
                 MessageBox.showerror("Error", "El numero de telefono debe ser de 20 digitos")
                 return
             
+            if not verify_email(correo_entry.get()):
+                MessageBox.showerror("Error", "El correo electronico no es valido")
+                return
+            
             if len(direccion_entry.get()) < 10 or len(direccion_entry.get()) > 40:
                 MessageBox.showerror("Error", "La direccion debe ser de 10 a 40 caracteres")
                 return
-            
-            # Validar correo
             
             
             # Validar cita fecha y tiempo
@@ -172,42 +179,122 @@ def programar_citas():
         tipo_horario_automatica = Radiobutton(window, text="Automatica", variable=tipo_horario_var, value=1)
         
         fecha_label = Label(window, text="Fecha")
-        fecha_entry = Entry(window)
+        fecha_year_entry = Entry(window, width=5)
+        fecha_month_entry = Entry(window, width=5)
+        fecha_day_entry = Entry(window, width=5)
+        
+        # Funcion que asegura que solo se puedan ingresar numeros en los campos de fecha y tiempo
+        
+        def validar_numero_input(action, value_if_allowed):
+            if value_if_allowed.strip().isdigit() or value_if_allowed == "":
+                return True
+            else:
+                return False
+        
+        validar_numero_input_cmd = (window.register(validar_numero_input), '%d', '%P')
+        
+        
+        fecha_year_entry.insert(0, 'AAAA')
+        fecha_year_entry.config(fg="grey")
+        fecha_year_entry.bind("<FocusIn>", lambda event: focus_in(event, fecha_year_entry, 'AAAA'))
+        fecha_year_entry.bind("<FocusOut>", lambda event: focus_out(event, fecha_year_entry, 'AAAA'))
+        fecha_year_entry.config(validate="key", validatecommand=validar_numero_input_cmd)
+        
+        fecha_month_entry.insert(0, 'MM')
+        fecha_month_entry.config(fg="grey")
+        fecha_month_entry.bind("<FocusIn>", lambda event: focus_in(event, fecha_month_entry, 'MM'))
+        fecha_month_entry.bind("<FocusOut>", lambda event: focus_out(event, fecha_month_entry, 'MM'))
+        fecha_month_entry.config(validate="key", validatecommand=validar_numero_input_cmd)
+        
+        fecha_day_entry.insert(0, 'DD')
+        fecha_day_entry.config(fg="grey")
+        fecha_day_entry.bind("<FocusIn>", lambda event: focus_in(event, fecha_day_entry, 'DD'))
+        fecha_day_entry.bind("<FocusOut>", lambda event: focus_out(event, fecha_day_entry, 'DD'))
+        fecha_day_entry.config(validate="key", validatecommand=validar_numero_input_cmd)
         
         tiempo_label = Label(window, text="Tiempo")
-        tiempo_entry = Entry(window)
+        tiempo_hora_entry = Entry(window, width=5)
+        tiempo_minutos_entry = Entry(window, width=5)
+        
+        tiempo_hora_entry.insert(0, 'HH')
+        tiempo_hora_entry.config(fg="grey")
+        tiempo_hora_entry.bind("<FocusIn>", lambda event: focus_in(event, tiempo_hora_entry, 'HH'))
+        tiempo_hora_entry.bind("<FocusOut>", lambda event: focus_out(event, tiempo_hora_entry, 'HH'))
+        tiempo_hora_entry.config(validate="key", validatecommand=validar_numero_input_cmd)
+        
+        tiempo_minutos_entry.insert(0, 'MM')
+        tiempo_minutos_entry.config(fg="grey")
+        tiempo_minutos_entry.bind("<FocusIn>", lambda event: focus_in(event, tiempo_minutos_entry, 'MM'))
+        tiempo_minutos_entry.bind("<FocusOut>", lambda event: focus_out(event, tiempo_minutos_entry, 'MM'))
+        tiempo_minutos_entry.config(validate="key", validatecommand=validar_numero_input_cmd)
+        
+        am_pm_var = StringVar(value='AM')
+        am_boton = Radiobutton(window, text="AM", variable=am_pm_var, value="AM")
+        pm_boton = Radiobutton(window, text="PM", variable=am_pm_var, value="PM")
+        
+        # Funciones que permiten que los campos de fecha y tiempo se comporten como placeholders
+         
+        def focus_in(event, entry, text):
+            if entry.get() == text:
+                entry.delete(0, END)
+                entry.config(fg="black")
+        
+        def focus_out(event, entry, text):
+            if entry.get().strip() == '':
+                entry.delete(0, END)
+                entry.insert(0, text)
+                entry.config(fg="grey")
         
         enviar_boton = Button(window, text="Enviar", command=enviar_cita)
         
-        
+
         # Posicionamiento de los elementos
         tipo_cita_label.grid(row=0, column=0, padx=10, pady=7)
         primera_cita.grid(row=0, column=1, padx=10, pady=7)
         reinspeccion_cita.grid(row=0, column=2, padx=10, pady=7)
+
         placa_label.grid(row=1, column=0, padx=10, pady=7)
         placa_entry.grid(row=1, column=1, padx=10, pady=7)
+
         tipo_vehiculo_label.grid(row=2, column=0, padx=10, pady=7)
-        tipo_vehiculo_listbox.grid(row=2, column=1, padx=10, pady=7)
+        tipo_vehiculo_listbox.grid(row=2, column=1, columnspan=2, padx=10, pady=7)
+
         marca_label.grid(row=3, column=0, padx=10, pady=7)
         marca_entry.grid(row=3, column=1, padx=10, pady=7)
+
         modelo_label.grid(row=4, column=0, padx=10, pady=7)
         modelo_entry.grid(row=4, column=1, padx=10, pady=7)
+
         propietario_label.grid(row=5, column=0, padx=10, pady=7)
         propietario_entry.grid(row=5, column=1, padx=10, pady=7)
+
         telefono_label.grid(row=6, column=0, padx=10, pady=7)
         telefono_entry.grid(row=6, column=1, padx=10, pady=7)
+
         correo_label.grid(row=7, column=0, padx=10, pady=7)
         correo_entry.grid(row=7, column=1, padx=10, pady=7)
+
         direccion_label.grid(row=8, column=0, padx=10, pady=7)
         direccion_entry.grid(row=8, column=1, padx=10, pady=7)
+
         tipo_horario_label.grid(row=9, column=0, padx=10, pady=7)
         tipo_horario_manual.grid(row=9, column=1, padx=10, pady=7)
         tipo_horario_automatica.grid(row=9, column=2, padx=10, pady=7)
+
         fecha_label.grid(row=10, column=0, padx=10, pady=7)
-        fecha_entry.grid(row=10, column=1, padx=10, pady=7)
+        fecha_year_entry.grid(row=10, column=1, padx=5, pady=7)
+        fecha_month_entry.grid(row=10, column=2, padx=5, pady=7, sticky=W)
+        fecha_day_entry.grid(row=10, column=3, padx=5, pady=7, sticky=W)
+
         tiempo_label.grid(row=11, column=0, padx=10, pady=7)
-        tiempo_entry.grid(row=11, column=1, padx=10, pady=7)
+        tiempo_hora_entry.grid(row=11, column=1, padx=5, pady=7)
+        tiempo_minutos_entry.grid(row=11, column=2, padx=5, pady=7, sticky=W)
+        
+        am_boton.grid(row=11, column=3, padx=5, pady=7, sticky=W)
+        pm_boton.grid(row=11, column=4, padx=5, pady=7, sticky=W)
+
         enviar_boton.grid(row=12, column=1, padx=10, pady=7)
+
             
         window.mainloop()
 
