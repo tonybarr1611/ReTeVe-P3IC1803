@@ -15,14 +15,14 @@ def iniciar_arbol():
     with open('modules/citas_abb.dat', 'r') as file:
         arbol_existente = json.load(file)
 
-    if arbol_existente == {'cantidad_citas': 0, 'arbol': []}:
+    if arbol_existente == {'cantidad_citas': 1, 'arbol': []}:
         return Arbol()
     else:
         arbol = Arbol()
         arbol = iniciar_arbol_aux(arbol_existente['arbol'], arbol)
         return arbol
 
-def guardar_arbol_aux(arbol, cita = 0):
+def guardar_arbol_aux(arbol, cita = 1):
     if cita > arbol.cantidad_citas - 1:
         return []
     else:
@@ -35,8 +35,8 @@ def guardar_arbol_aux(arbol, cita = 0):
         
     
 def guardar_arbol(arbol):
-    if arbol.cantidad_citas == 0:
-        arbol_existente = {'cantidad_citas': 0, 'arbol': []}
+    if arbol.cantidad_citas == 1:
+        arbol_existente = {'cantidad_citas': 1, 'arbol': []}
     else:
         arbol_existente = {'cantidad_citas': arbol.cantidad_citas, 'arbol': []}
         arbol_lista = guardar_arbol_aux(arbol)
@@ -64,7 +64,7 @@ class Nodo:
 # Se crea la clase Arbol que nos permitira crear el arbol binario
 class Arbol:
     # Se inicializa como un arbol de 0 nodos
-    def __init__(self, raiz = None, cantidad_citas = 0):
+    def __init__(self, raiz = None, cantidad_citas = 1):
         self.raiz = raiz
         self.cantidad_citas = cantidad_citas
     # Funcion auxiliar recursiva usada para agegar un nodo al arbol
