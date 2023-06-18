@@ -4,8 +4,6 @@ import os
 def iniciar_arbol_aux(arbol_lista, arbol):
     if len(arbol_lista) == 0:
         return arbol
-    print(arbol.cantidad_citas)
-    print(arbol_lista)
     arbol.agregar_nodo(arbol_lista[0]['tipo'], arbol_lista[0]['placa'], arbol_lista[0]['vehiculo'], arbol_lista[0]['marca'], arbol_lista[0]['modelo'], arbol_lista[0]['propietario'], arbol_lista[0]['telefono'], arbol_lista[0]['correo'], arbol_lista[0]['direccion'], arbol_lista[0]['fecha'])
     return iniciar_arbol_aux(arbol_lista[1:], arbol)
 
@@ -17,9 +15,24 @@ def iniciar_arbol():
         return Arbol()
     else:
         arbol = Arbol()
-        arbol.cantidad_citas = arbol_existente['cantidad_citas']
         arbol = iniciar_arbol_aux(arbol_existente['arbol'], arbol)
         return arbol
+
+def guardar_arbol_aux(arbol, cita = 0):
+    if cita > arbol.cantidad_citas - 1:
+        return []
+    else:
+        return [arbol.consultar_nodo(cita).datos] + guardar_arbol_aux(arbol, cita + 1)
+    
+def guardar_arbol(arbol):
+    if arbol.cantidad_citas == 0:
+        arbol_existente = {'cantidad_citas': 0, 'arbol': []}
+    else:
+        arbol_existente = {'cantidad_citas': arbol.cantidad_citas, 'arbol': []}
+        arbol_lista = guardar_arbol_aux(arbol)
+        arbol_existente['arbol'] = arbol_lista
+    with open('modules/citas_abb.dat', 'w') as file:
+        file.write(json.dumps(arbol_existente))
 
 class Nodo:
     def __init__(self, cita, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha, izquierda = None, derecha = None):
@@ -60,7 +73,6 @@ class Arbol:
                 nodo_actual.derecha = nodo_insertado
         
     def agregar_nodo(self, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha):
-        print(self.cantidad_citas)
         nodo = Nodo(self.cantidad_citas, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha)
         # Si el arbol esta vacio, el nodo se vuelve la raiz
         if self.raiz == None:
@@ -86,4 +98,7 @@ class Arbol:
 arbol = iniciar_arbol()
 while True:
     cita = int(input('Ingrese el numero de cita: '))
+    if cita == -1:
+        guardar_arbol(arbol)
+        break
     print(arbol.consultar_nodo(cita).datos)
