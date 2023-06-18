@@ -4,8 +4,12 @@ import tkinter as tk
 from tkinter import messagebox as MessageBox
 from verify_email import verify_email
 from datetime import datetime
+from modules.abb import *
 
 def programar_citas():
+    programador = iniciar_arbol()
+    print(programador.consultar_nodo(0).datos)
+    
     # Crear ventana para programar citas
     def crear_cita_window():
         
@@ -14,8 +18,7 @@ def programar_citas():
         
         # Funcion para enviar la cita
         def enviar_cita():
-            numero_cita = 0
-            tipo_cita = tipo_cita_checkbutton.get()
+            tipo = tipo_cita_checkbutton.get()
             placa = placa_entry.get()
             vehiculo = tipo_vehiculo_listbox.get(ACTIVE)
             marca = marca_entry.get()
@@ -27,7 +30,9 @@ def programar_citas():
             fecha_year = int(fecha_year_entry.get())
             fecha_month = int(fecha_month_entry.get())
             fecha_day = int(fecha_day_entry.get())
-            fecha = datetime(year=fecha_year, month=fecha_month, day=fecha_day)
+            tiempo_hora = int(tiempo_hora_entry.get())
+            tiempo_minutos = int(tiempo_minutos_entry.get())
+            fecha = int(str(fecha_year) + str(fecha_month) + str(fecha_day) + str(tiempo_hora) + str(tiempo_minutos))
             
             
             # Validacion de datos
@@ -66,7 +71,8 @@ def programar_citas():
             
             # Validar cita fecha y tiempo
 
-            
+            programador.agregar_nodo(tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha)
+            guardar_arbol(programador)
             MessageBox.showinfo("Cita programada", "La cita ha sido programada exitosamente")
             window.destroy()
         
