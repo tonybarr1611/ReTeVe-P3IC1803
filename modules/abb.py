@@ -4,7 +4,6 @@ import os
 def iniciar_arbol_aux(arbol_lista, arbol):
     if len(arbol_lista) == 0:
         return arbol
-    print(arbol_lista[0])
     if arbol_lista[0]['cita'] != arbol.cantidad_citas:
         arbol.cantidad_citas = arbol.cantidad_citas + 1
         return iniciar_arbol_aux(arbol_lista, arbol)
@@ -105,11 +104,3 @@ class Arbol:
     
     def consultar_nodo(self, cita):
         return self.consultar_nodo_aux(cita, self.raiz)
-
-arbol = iniciar_arbol()
-while True:
-    cita = int(input('Ingrese el numero de cita: '))
-    if cita == -1:
-        guardar_arbol(arbol)
-        break
-    print(arbol.consultar_nodo(cita).datos)
