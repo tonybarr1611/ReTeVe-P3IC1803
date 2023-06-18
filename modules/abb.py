@@ -4,8 +4,13 @@ import os
 def iniciar_arbol_aux(arbol_lista, arbol):
     if len(arbol_lista) == 0:
         return arbol
-    arbol.agregar_nodo(arbol_lista[0]['tipo'], arbol_lista[0]['placa'], arbol_lista[0]['vehiculo'], arbol_lista[0]['marca'], arbol_lista[0]['modelo'], arbol_lista[0]['propietario'], arbol_lista[0]['telefono'], arbol_lista[0]['correo'], arbol_lista[0]['direccion'], arbol_lista[0]['fecha'])
-    return iniciar_arbol_aux(arbol_lista[1:], arbol)
+    print(arbol_lista[0])
+    if arbol_lista[0]['cita'] != arbol.cantidad_citas:
+        arbol.cantidad_citas = arbol.cantidad_citas + 1
+        return iniciar_arbol_aux(arbol_lista, arbol)
+    else:
+        arbol.agregar_nodo(arbol_lista[0]['tipo'], arbol_lista[0]['placa'], arbol_lista[0]['vehiculo'], arbol_lista[0]['marca'], arbol_lista[0]['modelo'], arbol_lista[0]['propietario'], arbol_lista[0]['telefono'], arbol_lista[0]['correo'], arbol_lista[0]['direccion'], arbol_lista[0]['fecha'])
+        return iniciar_arbol_aux(arbol_lista[1:], arbol)
 
 def iniciar_arbol():
     with open('modules/citas_abb.dat', 'r') as file:
@@ -22,7 +27,13 @@ def guardar_arbol_aux(arbol, cita = 0):
     if cita > arbol.cantidad_citas - 1:
         return []
     else:
-        return [arbol.consultar_nodo(cita).datos] + guardar_arbol_aux(arbol, cita + 1)
+        try:
+            datos = arbol.consultar_nodo(cita).datos
+            datos["cita"] = cita
+            return [datos] + guardar_arbol_aux(arbol, cita + 1)
+        except:
+            return guardar_arbol_aux(arbol, cita + 1)
+        
     
 def guardar_arbol(arbol):
     if arbol.cantidad_citas == 0:
