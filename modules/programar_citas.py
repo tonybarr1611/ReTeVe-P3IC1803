@@ -8,7 +8,6 @@ from modules.abb import *
 
 def programar_citas():
     programador = iniciar_arbol()
-    print(programador.consultar_nodo(0).datos)
     
     # Crear ventana para programar citas
     def crear_cita_window():
@@ -31,9 +30,7 @@ def programar_citas():
             fecha_month = int(fecha_month_entry.get())
             fecha_day = int(fecha_day_entry.get())
             tiempo_hora = int(tiempo_hora_entry.get())
-            tiempo_minutos = int(tiempo_minutos_entry.get())
-            fecha = int(str(fecha_year) + str(fecha_month) + str(fecha_day) + str(tiempo_hora) + str(tiempo_minutos))
-            
+            tiempo_minutos = int(tiempo_minutos_entry.get())           
             
             # Validacion de datos
             if placa_entry.get() == "" or len(placa_entry.get()) > 8 :
@@ -70,8 +67,42 @@ def programar_citas():
             
             
             # Validar cita fecha y tiempo
-
-            programador.agregar_nodo(tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha)
+            if len(str(fecha_year)) != 4:
+                MessageBox.showerror("Error", "El año debe ser un numero de 4 digitos")
+                return
+            if len(str(fecha_month)) > 2 or fecha_month > 12 or fecha_month < 1:
+                MessageBox.showerror("Error", "El mes debe ser un numero de 2 digitos")
+                return
+            if len(str(fecha_day)) > 2 or fecha_day > 31 or fecha_day < 1:
+                MessageBox.showerror("Error", "El dia debe ser un numero de 2 digitos")
+                return
+            if len(str(tiempo_hora)) > 2 or tiempo_hora > 23 or tiempo_hora < 0:
+                MessageBox.showerror("Error", "La hora debe ser un numero de 2 digitos")
+                return
+            if len(str(tiempo_minutos)) > 2 or tiempo_minutos > 59 or tiempo_minutos < 0:
+                MessageBox.showerror("Error", "Los minutos deben ser un numero de 2 digitos")
+                return
+            
+            if len(str(fecha_month)) == 1:
+                fecha_month = "0" + str(fecha_month)
+            if len(str(fecha_day)) == 1:
+                fecha_day = "0" + str(fecha_day)
+            if len(str(tiempo_hora)) == 1:
+                tiempo_hora = "0" + str(tiempo_hora)
+            if len(str(tiempo_minutos)) == 1:
+                tiempo_minutos = "0" + str(tiempo_minutos)
+             
+            fecha_actual = datetime.now()
+            fecha_actual = int(str(fecha_actual.year).rjust(4, "0") + str(fecha_actual.month).rjust(2, "0") + str(fecha_actual.day).rjust(2, "0") + str(fecha_actual.hour).rjust(2, "0") + str(fecha_actual.minute).rjust(2, "0"))
+            hora_cita = int(str(fecha_year) + str(fecha_month) + str(fecha_day) + str(tiempo_hora) + str(tiempo_minutos))
+            if fecha_actual > hora_cita:
+                MessageBox.showerror("Error", "La fecha y hora de la cita no puede ser menor a la fecha y hora actual")
+                return
+            if int(str(hora_cita)[:8]) - int(str(fecha_actual)[:8]) > 10000:
+                MessageBox.showerror("Error", "La cita debe estar en un plazo de un año")
+                return
+            
+            programador.agregar_nodo(tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, hora_cita)
             guardar_arbol(programador)
             MessageBox.showinfo("Cita programada", "La cita ha sido programada exitosamente")
             window.destroy()
@@ -172,9 +203,7 @@ def programar_citas():
         tiempo_minutos_entry.bind("<FocusOut>", lambda event: focus_out(event, tiempo_minutos_entry, 'MM'))
         tiempo_minutos_entry.config(validate="key", validatecommand=validar_numero_input_cmd)
         
-        am_pm_var = StringVar(value='AM')
-        am_boton = Radiobutton(window, text="AM", variable=am_pm_var, value="AM")
-        pm_boton = Radiobutton(window, text="PM", variable=am_pm_var, value="PM")
+
         
         # Funciones que permiten que los campos de fecha y tiempo se comporten como placeholders
          
@@ -234,8 +263,6 @@ def programar_citas():
         tiempo_hora_entry.grid(row=11, column=1, padx=5, pady=7)
         tiempo_minutos_entry.grid(row=11, column=2, padx=5, pady=7, sticky=W)
         
-        am_boton.grid(row=11, column=3, padx=5, pady=7, sticky=W)
-        pm_boton.grid(row=11, column=4, padx=5, pady=7, sticky=W)
 
         enviar_boton.grid(row=12, column=1, padx=10, pady=7)
 
