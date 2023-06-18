@@ -1,5 +1,4 @@
 import json
-import os
 
 def iniciar_arbol_aux(arbol_lista, arbol):
     if len(arbol_lista) == 0:
@@ -8,7 +7,7 @@ def iniciar_arbol_aux(arbol_lista, arbol):
         arbol.cantidad_citas = arbol.cantidad_citas + 1
         return iniciar_arbol_aux(arbol_lista, arbol)
     else:
-        arbol.agregar_nodo(arbol_lista[0]['tipo'], arbol_lista[0]['placa'], arbol_lista[0]['vehiculo'], arbol_lista[0]['marca'], arbol_lista[0]['modelo'], arbol_lista[0]['propietario'], arbol_lista[0]['telefono'], arbol_lista[0]['correo'], arbol_lista[0]['direccion'], arbol_lista[0]['fecha'])
+        arbol.agregar_nodo(arbol_lista[0]['tipo'], arbol_lista[0]['placa'], arbol_lista[0]['vehiculo'], arbol_lista[0]['marca'], arbol_lista[0]['modelo'], arbol_lista[0]['propietario'], arbol_lista[0]['telefono'], arbol_lista[0]['correo'], arbol_lista[0]['direccion'], arbol_lista[0]['fecha'], arbol_lista[0]['estado'])
         return iniciar_arbol_aux(arbol_lista[1:], arbol)
 
 def iniciar_arbol():
@@ -45,7 +44,7 @@ def guardar_arbol(arbol):
         file.write(json.dumps(arbol_existente))
 
 class Nodo:
-    def __init__(self, cita, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha, izquierda = None, derecha = None):
+    def __init__(self, cita, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha, estado, izquierda = None, derecha = None):
         self.cita = cita
         self.datos = {
             'tipo': tipo,
@@ -57,7 +56,8 @@ class Nodo:
             'telefono': telefono,
             'correo': correo,
             'direccion': direccion,
-            'fecha': fecha
+            'fecha': fecha,
+            'estado': estado
         }
         self.izquierda = izquierda
         self.derecha = derecha
@@ -82,8 +82,8 @@ class Arbol:
             else:
                 nodo_actual.derecha = nodo_insertado
         
-    def agregar_nodo(self, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha):
-        nodo = Nodo(self.cantidad_citas, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha)
+    def agregar_nodo(self, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha, estado = 'PENDIENTE'):
+        nodo = Nodo(self.cantidad_citas, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha, estado)
         # Si el arbol esta vacio, el nodo se vuelve la raiz
         if self.raiz == None:
             self.raiz = nodo
