@@ -44,3 +44,17 @@ class Arbol:
         else:
             self.agregar_nodo_aux(nodo, self.raiz)
         self.cantidad_citas = self.cantidad_citas + 1
+    
+    def consultar_nodo_aux(self, cita, nodo_actual):
+        if nodo_actual != None:
+            if cita == nodo_actual.cita:
+                return nodo_actual
+            elif cita < nodo_actual.cita:
+                return self.consultar_nodo_aux(cita, nodo_actual.izquierda)
+            else:
+                return self.consultar_nodo_aux(cita, nodo_actual.derecha)
+        else:
+            return None
+    
+    def consultar_nodo(self, cita):
+        return self.consultar_nodo_aux(cita, self.raiz)
