@@ -6,75 +6,15 @@ from verify_email import verify_email
 from datetime import datetime
 
 def programar_citas():
-    # Clase nodo para guardar las citas en un arbol binario
-    class Nodo:
-        def __init__(self, cita, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha):
-            self.cita = cita
-            self.tipo = tipo
-            self.placa = placa
-            self.vehiculo = vehiculo
-            self.marca = marca
-            self.modelo = modelo
-            self.propietario = propietario
-            self.telefono = telefono
-            self.correo = correo
-            self.direccion = direccion
-            self.fecha = fecha
-            self.izquierda = None
-            self.derecha = None
-
-    # Clase para programar citas
-    class ProgramarCitas:
-        def __init__(self):
-            self.root = None
-            self.contador_citas = 1
-            
-        def insertar_cita(self, numero_cita, tipo_cita, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha):
-            nuevo_nodo = Nodo(numero_cita, tipo_cita, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha)
-        
-            if self.root is None:
-                self.root = nuevo_nodo
-            else:
-                self._insertar_recursivo(self.root, nuevo_nodo)
-
-        def _insertar_recursivo(self, nodo_actual, nuevo_nodo):
-            if nuevo_nodo.fecha < nodo_actual.fecha:
-                if nodo_actual.izquierda is None:
-                    nodo_actual.izquierda = nuevo_nodo
-                else:
-                    self._insertar_recursivo(nodo_actual.izquierda, nuevo_nodo)
-            else:
-                if nodo_actual.derecha is None:
-                    nodo_actual.derecha = nuevo_nodo
-                else:
-                    self._insertar_recursivo(nodo_actual.derecha, nuevo_nodo)
-        
-        def get_cuenta_cita(self):
-            return self.contador_citas
-        
-        def aumentar_contador_cita(self):
-            self.contador_citas += 1
-        
-        def buscar_cita_disponible(self, nodo_actual, lista_citas, fecha_actual):
-            if nodo_actual is None:
-                return
-            
-            if nodo_actual.fecha > fecha_actual:
-                lista_citas.append(nodo_actual.fecha)
-            
-            self.buscar_cita_disponible(nodo_actual.izquierda, lista_citas, fecha_actual)
-            self.buscar_cita_disponible(nodo_actual.derecha, lista_citas, fecha_actual)
-
     # Crear ventana para programar citas
     def crear_cita_window():
-        programador = ProgramarCitas()
         
         window = Tk()
         window.title("Programar cita")
         
         # Funcion para enviar la cita
         def enviar_cita():
-            numero_cita = programador.get_cuenta_cita()
+            numero_cita = 0
             tipo_cita = tipo_cita_checkbutton.get()
             placa = placa_entry.get()
             vehiculo = tipo_vehiculo_listbox.get(ACTIVE)
@@ -89,8 +29,6 @@ def programar_citas():
             fecha_day = int(fecha_day_entry.get())
             fecha = datetime(year=fecha_year, month=fecha_month, day=fecha_day)
             
-            programador.insertar_cita(numero_cita, tipo_cita, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha)
-            programador.aumentar_contador_cita()
             
             # Validacion de datos
             if placa_entry.get() == "" or len(placa_entry.get()) > 8 :
