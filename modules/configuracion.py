@@ -16,6 +16,25 @@ def validar_numero_input(action, value_if_allowed):
 # Funcion configuracion
 def configuracion():
     def guardar_configuracion():
+        with open("modules/configuracion.dat", "r") as file:
+            configuracion_dict = json.loads(file.read())
+        if configuracion_dict['cantidad_lineas'] != cantidad_lineas_combobox.get():
+            with open("modules/estaciones.dat", "r") as file:
+                estaciones_dict = json.loads(file.read())
+                if len(estaciones_dict) > int(cantidad_lineas_combobox.get()):
+                    print(int(cantidad_lineas_combobox.get()), len(estaciones_dict))
+                    for n in range(int(cantidad_lineas_combobox.get()), len(estaciones_dict)):
+                        print(n)
+                        if estaciones_dict[str(n + 1)]['espera'] == {} and estaciones_dict[str(n + 1)]["revision"] == {"1": "", "2": "", "3": "", "4": "", "5": ""}:
+                            del estaciones_dict[str(n + 1)]
+                        else:
+                            return MessageBox.showerror("Configuración", "No se puede reducir la cantidad de líneas mientras haya citas en espera o en revisión")
+                else:
+                    for n in range(len(estaciones_dict), int(cantidad_lineas_combobox.get())):
+                        estaciones_dict[str(n + 1)] = ({"espera": {}, "revision": {"1": "", "2": "", "3": "", "4": "", "5": ""}})
+                with open("modules/estaciones.dat", "w") as file:
+                    file.write(json.dumps(estaciones_dict))
+
         configuracion_dict = {}
         configuracion_dict['cantidad_lineas'] = cantidad_lineas_combobox.get()
         configuracion_dict['hora_inicio'] = hora_inicio_combobox.get()
