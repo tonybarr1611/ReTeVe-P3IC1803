@@ -55,9 +55,7 @@ def tablero_citas():
                             return
 
                 for puesto in estaciones[linea]['revision']:
-                    print(estaciones[linea]['revision'][puesto], puesto)
                     if estaciones[linea]['revision'][puesto] != "" and str(estaciones[linea]['revision'][puesto][1]) == placa_comando:
-                        print("2")
                         if int(puesto) == 5:
                             return MessageBox.showerror("Error", "La placa ya se encuentra en la ultima posicion de la linea")
                         for n in range(int(puesto), 5):
@@ -75,13 +73,23 @@ def tablero_citas():
                                 tablero_labels = rellenar_tablero(estaciones, [])
                                 comando_entry.delete(0, END)
                                 return MessageBox.showinfo("Exito", "La placa se ha desplazado correctamente")
-
-                        return MessageBox.showerror('Error', 'No hay espacio suficiente para desplazar la placa')
-                        
-                            
+                        return MessageBox.showerror('Error', 'No hay espacio suficiente para desplazar la placa')          
             return MessageBox.showerror("Error", "La placa no se puede desplazar")
         elif comando[0] == "U":
-            pass
+            for linea in estaciones:
+                for puesto in estaciones[linea]['revision']:
+                    if estaciones[linea]['revision'][puesto] != "" and str(estaciones[linea]['revision'][puesto][1]) == placa_comando:
+                        if int(puesto) == 5:
+                            return MessageBox.showerror("Error", "La placa ya se encuentra en la ultima posicion de la linea")
+                        if estaciones[linea]['revision'][str(int(puesto) + 1)] == "":
+                            estaciones[linea]['revision'][str(int(puesto) + 1)] = estaciones[linea]['revision'][puesto]
+                            estaciones[linea]['revision'][puesto] = ""
+                            guardar_estaciones(estaciones)
+                            tablero_labels = rellenar_tablero(estaciones, [])
+                            return MessageBox.showinfo("Exito", "La placa se ha desplazado correctamente")
+                        else:
+                            return MessageBox.showerror("Error", "No hay espacio suficiente para desplazar la placa")
+            return MessageBox.showerror("Error", "La placa no existe en el tablero")
         elif comando[0] == "E":
             pass
         elif comando[0] == "F":
