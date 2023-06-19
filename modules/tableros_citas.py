@@ -7,16 +7,89 @@ from modules.abb import *
 import json
 
 def tablero_citas():
-    def rellenar_tablero(estaciones):
+    def rellenar_tablero(estaciones, tablero_labels):
+        if tablero_labels != []:
+            for n in tablero_labels:
+                n.destroy()
+        tablero_labels = []
         for i in range(1, int(configuracion['cantidad_lineas']) + 1):
             for puesto in estaciones[str(i)]['revision']:
                 try:
-                    Label(ventana_tablero, text = estaciones[str(i)]['revision'][puesto][1], font = ("Arial", 12)).grid(row = i + 1, column = puesto, pady = 3, padx = 20)
+                    nodo_cita = programador.consultar_nodo(int(estaciones[str(i)]['revision'][puesto][0]))
+                    try:
+                        if nodo_cita.datos['fallas'] != None:
+                            label_placa = Label(ventana_tablero, text = estaciones[str(i)]['revision'][puesto][1], font = ("Arial", 12), fg="red")
+                            label_placa.grid(row = i + 1, column = puesto, pady = 3, padx = 20)
+                            tablero_labels.append(label_placa)
+                    except:
+                        label_placa = Label(ventana_tablero, text = estaciones[str(i)]['revision'][puesto][1], font = ("Arial", 12))
+                        label_placa.grid(row = i + 1, column = puesto, pady = 3, padx = 20)
+                        tablero_labels.append(label_placa)
                 except:
-                    Label(ventana_tablero, text = "", font = ("Arial", 12)).grid(row = i + 1, column = puesto, pady = 3, padx = 20)
-                
+                    label_placa = Label(ventana_tablero, text = "", font = ("Arial", 12))
+                    label_placa.grid(row = i + 1, column = puesto, pady = 3, padx = 20)
+                    tablero_labels.append(label_placa)
+        return tablero_labels
+    def guardar_estaciones(estaciones):
+        with open("modules/estaciones.dat", "w") as file:
+            file.write(json.dumps(estaciones))
+            
     def ejecutar_comando():
-        pass
+        comando = comando_entry.get()
+        placa_comando = comando[1:]
+        if comando == "":
+            return MessageBox.showerror("Error", "El comando no es válido")
+        if comando[0] == "T":
+            for linea in estaciones:
+                if len(estaciones[linea]['espera']) != 0 and str(estaciones[linea]['espera']["1"][1]) == placa_comando:
+                    for n in range(1, 6):
+                        if estaciones[linea]['revision'][str(n)] == '':
+                            for n in range(1, n + 1)[::-1]:
+                                try:
+                                    estaciones[linea]['revision'][str(n)] = estaciones[linea]['revision'][str(n - 1)]
+                                except:
+                                    estaciones[linea]['revision'][str(n)] = estaciones[linea]['espera']["1"]
+                            estaciones[linea]['espera'].pop("1")
+                            guardar_estaciones(estaciones)
+                            tablero_labels = rellenar_tablero(estaciones, [])
+                            return
+
+                for puesto in estaciones[linea]['revision']:
+                    print(estaciones[linea]['revision'][puesto], puesto)
+                    if estaciones[linea]['revision'][puesto] != "" and str(estaciones[linea]['revision'][puesto][1]) == placa_comando:
+                        print("2")
+                        if int(puesto) == 5:
+                            return MessageBox.showerror("Error", "La placa ya se encuentra en la ultima posicion de la linea")
+                        for n in range(int(puesto), 5):
+                            if estaciones[linea]['revision'][str(n + 1)] == '':
+                                for j in range(int(puesto), n + 2)[::-1]:
+                                    try:
+                                        estaciones[linea]['revision'][str(j)] = estaciones[linea]['revision'][str(j - 1)]
+                                    except:
+                                        if len(estaciones[linea]['espera']) != 0:
+                                            estaciones[linea]['revision'][str(j)] = estaciones[linea]['espera']["1"]
+                                            estaciones[linea]['espera'].pop("1")  
+                                        else:
+                                            estaciones[linea]['revision'][str(j)] = ""
+                                guardar_estaciones(estaciones)
+                                tablero_labels = rellenar_tablero(estaciones, [])
+                                comando_entry.delete(0, END)
+                                return MessageBox.showinfo("Exito", "La placa se ha desplazado correctamente")
+
+                        return MessageBox.showerror('Error', 'No hay espacio suficiente para desplazar la placa')
+                        
+                            
+            return MessageBox.showerror("Error", "La placa no se puede desplazar")
+        elif comando[0] == "U":
+            pass
+        elif comando[0] == "E":
+            pass
+        elif comando[0] == "F":
+            pass
+        elif comando[0] == "R":
+            pass
+        else:
+            return MessageBox.showerror("Error", "El comando no es válido")
     programador = iniciar_arbol()
     with open("modules/configuracion.dat", "r") as file:
         configuracion = json.load(file)
@@ -57,4 +130,4 @@ def tablero_citas():
     comando_boton.grid(row = int(configuracion['cantidad_lineas']) + 2, column = 3, pady = 3)
     with open("modules/estaciones.dat", "r") as file:
         estaciones = json.load(file)
-    rellenar_tablero(estaciones)
+    tablero_labels = rellenar_tablero(estaciones, [])
