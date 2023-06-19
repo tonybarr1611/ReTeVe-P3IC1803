@@ -1,5 +1,8 @@
 import json
 
+# Auxiliar de iniciar_arbol
+# Entradas: arbol_lista (lista), arbol (Arbol)
+# Salida: arbol (Arbol)
 def iniciar_arbol_aux(arbol_lista, arbol):
     if len(arbol_lista) == 0:
         return arbol
@@ -9,7 +12,9 @@ def iniciar_arbol_aux(arbol_lista, arbol):
     else:
         arbol.agregar_nodo(arbol_lista[0]['tipo'], arbol_lista[0]['placa'], arbol_lista[0]['vehiculo'], arbol_lista[0]['marca'], arbol_lista[0]['modelo'], arbol_lista[0]['propietario'], arbol_lista[0]['telefono'], arbol_lista[0]['correo'], arbol_lista[0]['direccion'], arbol_lista[0]['fecha'], arbol_lista[0]['estado'])
         return iniciar_arbol_aux(arbol_lista[1:], arbol)
-
+# Carga los datos del arbol de citas
+# Entradas: Ninguna
+# Salidas: arbol (Arbol)
 def iniciar_arbol():
     with open('modules/citas_abb.dat', 'r') as file:
         arbol_existente = json.load(file)
@@ -20,7 +25,9 @@ def iniciar_arbol():
         arbol = Arbol()
         arbol = iniciar_arbol_aux(arbol_existente['arbol'], arbol)
         return arbol
-
+# Auxiliar de guardar_arbol
+# Entradas: arbol (Arbol), cita (int)
+# Salidas: lista (list)
 def guardar_arbol_aux(arbol, cita = 1):
     if cita > arbol.cantidad_citas - 1:
         return []
@@ -32,7 +39,9 @@ def guardar_arbol_aux(arbol, cita = 1):
         except:
             return guardar_arbol_aux(arbol, cita + 1)
         
-    
+# Guarda los datos del arbol de citas
+# Entradas: arbol (Arbol)
+# Salidas: Ninguna   
 def guardar_arbol(arbol):
     if arbol.cantidad_citas == 1:
         arbol_existente = {'cantidad_citas': 1, 'arbol': []}
@@ -42,7 +51,7 @@ def guardar_arbol(arbol):
         arbol_existente['arbol'] = arbol_lista
     with open('modules/citas_abb.dat', 'w') as file:
         file.write(json.dumps(arbol_existente))
-
+# Clase Nodo que nos permite crear los nodos del arbol
 class Nodo:
     def __init__(self, cita, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha, estado, izquierda = None, derecha = None):
         self.cita = cita
@@ -81,7 +90,7 @@ class Arbol:
                 self.agregar_nodo_aux(nodo_insertado, nodo_actual.derecha)
             else:
                 nodo_actual.derecha = nodo_insertado
-        
+    # Funcion que agrega un nodo al arbol   
     def agregar_nodo(self, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha, estado = 'PENDIENTE'):
         nodo = Nodo(self.cantidad_citas, tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, fecha, estado)
         # Si el arbol esta vacio, el nodo se vuelve la raiz
@@ -90,7 +99,7 @@ class Arbol:
         else:
             self.agregar_nodo_aux(nodo, self.raiz)
         self.cantidad_citas = self.cantidad_citas + 1
-    
+    # Funcion auxiliar recursiva usada para consultar un nodo del arbol
     def consultar_nodo_aux(self, cita, nodo_actual):
         if nodo_actual != None:
             if cita == nodo_actual.cita:
@@ -101,6 +110,6 @@ class Arbol:
                 return self.consultar_nodo_aux(cita, nodo_actual.derecha)
         else:
             return None
-    
+    # Consulta un nodo del arbol
     def consultar_nodo(self, cita):
         return self.consultar_nodo_aux(cita, self.raiz)

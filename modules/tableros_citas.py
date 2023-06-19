@@ -37,8 +37,9 @@ def enviar_correo(file_path, destinatario):
         print(f"Correo enviado correctamente a {destinatario}")
     except:
         print("Error al enviar el correo")
-
+# Funcion principal de la ventana de tablero de citas
 def tablero_citas():
+    # Rellena el tablero con los datos de las citas
     def rellenar_tablero(estaciones, tablero_labels):
         if tablero_labels != []:
             for n in tablero_labels:
@@ -62,10 +63,11 @@ def tablero_citas():
                     label_placa.grid(row = i + 1, column = puesto, pady = 3, padx = 20)
                     tablero_labels.append(label_placa)
         return tablero_labels
+    # Guarda los datos de las citas en el archivo de citas
     def guardar_estaciones(estaciones):
         with open("modules/estaciones.dat", "w") as file:
             file.write(json.dumps(estaciones))
-            
+    # Ejecuta los distintos comandos que se le indiquen     
     def ejecutar_comando():
         comando = comando_entry.get()
         placa_comando = comando[1:]
@@ -123,7 +125,6 @@ def tablero_citas():
                             return MessageBox.showerror("Error", "No hay espacio suficiente para desplazar la placa")
             return MessageBox.showerror("Error", "La placa no existe en el tablero")
         elif comando[0] == "E":
-            # Falta verificacion de que la falta exista
             falla = comando[-4:]
             placa_comando = placa_comando[:-4]
             for linea in estaciones:
@@ -206,7 +207,7 @@ def tablero_citas():
     programador = iniciar_arbol()
     with open("modules/configuracion.dat", "r") as file:
         configuracion = json.load(file)
-        
+    # Se crea la ventana del tablero  
     ventana_tablero = Toplevel()
     ventana_tablero.title("Tablero de citas")
     ventana_tablero.maxsize(800, 290 + ((int(configuracion['cantidad_lineas']) - 5) * 35))

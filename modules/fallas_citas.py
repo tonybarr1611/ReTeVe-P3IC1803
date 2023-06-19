@@ -5,8 +5,9 @@ from tkinter import messagebox as MessageBox
 from datetime import datetime
 from modules.abb import *
 import json
-
+# Funciones CRUD de las fallas
 def fallas_citas():
+    # Funcion R
     def cargar():
         llave_entry.delete(0, END)
         descripcion_entry.delete(0, END)
@@ -27,7 +28,7 @@ def fallas_citas():
                     llave_entry.delete(0, END)
                     descripcion_entry.delete(0, END)
                     tipo_string.set("Seleccione")
-    
+    # Funcion C y U
     def create():
         with open("modules/fallas.dat", "r") as file:
             fallas = json.loads(file.read())
@@ -67,8 +68,7 @@ def fallas_citas():
             MessageBox.showinfo("Falla actualizada", "La falla ha sido actualizada")
             with open("modules/fallas.dat", "w") as file:
                 file.write(json.dumps(fallas))
-                
-    
+    # Funcion D
     def delete():
         cargar()
         if MessageBox.askyesno("Eliminar", "¿Desea eliminar la falla?"):
@@ -91,7 +91,7 @@ def fallas_citas():
             return
     
     programador = iniciar_arbol()
-    
+    # Se inicia la ventana
     ventana_fallas = Toplevel()
     ventana_fallas.title("Lista de Fallas")
     ventana_fallas.geometry("500x500")

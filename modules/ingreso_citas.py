@@ -5,7 +5,7 @@ from tkinter import messagebox as MessageBox
 from datetime import datetime
 from modules.abb import *
 import json
-
+# Funcion usada para ingresar citas a la cola de espera
 def ingreso_citas():
     def ingresar():
         cita = cita_entry.get()
