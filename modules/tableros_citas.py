@@ -110,7 +110,9 @@ def tablero_citas():
         elif comando[0] == "F":
             pass
         elif comando[0] == "R":
-            pass
+            guardar_arbol(programador)
+            guardar_estaciones(estaciones)
+            ventana_tablero.destroy()
         else:
             return MessageBox.showerror("Error", "El comando no es válido")
     programador = iniciar_arbol()
