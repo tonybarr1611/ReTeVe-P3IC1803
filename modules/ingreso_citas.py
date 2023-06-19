@@ -28,6 +28,8 @@ def ingreso_citas():
         print(fecha_actual)
         if (nodo_cita.datos['fecha'] - fecha_actual) > 100:
             return MessageBox.showerror("Error", "Se debe realizar el ingreso como maximo 1 hora antes de la cita")
+        with open('modules/configuracion.dat', 'r') as file:
+            configuracion = json.load(file)
         
         marca_label = Label(ventana_ingreso, text = "Marca: " + str(nodo_cita.datos['marca']), font = ("Arial", 15))
         marca_label.grid(row = 4, column = 1, pady = 10)
@@ -35,20 +37,22 @@ def ingreso_citas():
         modelo_label.grid(row = 5, column = 1, pady = 10)
         propietario_label = Label(ventana_ingreso, text = "Propietario: " + str(nodo_cita.datos['propietario']), font = ("Arial", 15))
         propietario_label.grid(row = 6, column = 1, pady = 10)
-        costo_label = Label(ventana_ingreso, text = "Costo: ", font = ("Arial", 15))
+        costo_label = Label(ventana_ingreso, text = f"Costo: {int(configuracion[nodo_cita.datos['vehiculo']]) * ((float(configuracion['iva'])/100) + 1)}", font = ("Arial", 15))
         costo_label.grid(row = 7, column = 1, pady = 10)
         
         with open("modules/estaciones.dat", "r") as file:
             estaciones = json.load(file)
         min_linea = [0, 0]
         for estacion in estaciones:
-            for linea in estaciones[estacion]["espera"]:
-                if estaciones[estacion]["espera"][linea][0] == cita:
-                    return MessageBox.showerror("Error", "La cita ya se encuentra en la estacion " + estacion)
-            for linea in estaciones[estacion]["revision"]:
-                if estaciones[estacion]["revision"][linea][0] == cita:
-                    return MessageBox.showerror("Error", "La cita ya se encuentra en la estacion " + estacion)
-
+            try:
+                for linea in estaciones[estacion]["espera"]:
+                    if estaciones[estacion]["espera"][linea][0] == cita:
+                        return MessageBox.showerror("Error", "La cita ya se encuentra en la estacion " + estacion)
+                for linea in estaciones[estacion]["revision"]:
+                    if estaciones[estacion]["revision"][linea][0] == cita:
+                        return MessageBox.showerror("Error", "La cita ya se encuentra en la estacion " + estacion)
+            except:
+                pass
             if min_linea == [0, 0]:
                 min_linea = [estacion, len(estaciones[estacion]["espera"])]
             elif len(estaciones[estacion]["espera"]) < min_linea[1]:
