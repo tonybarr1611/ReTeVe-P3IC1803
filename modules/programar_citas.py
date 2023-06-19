@@ -5,7 +5,31 @@ from tkinter import messagebox as MessageBox
 from verify_email import verify_email
 from datetime import datetime, timedelta
 from modules.abb import *
+import os
+import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
 
+def enviar_correo(destinatario, fecha):
+    fecha = str(fecha)
+    remitente = "sistemaatletismo@gmail.com"
+    mail_password = "ckjrjpoimpgdxroq"
+    try:
+        correo = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        correo.login(remitente, mail_password)
+        message = MIMEMultipart()
+        message['Subject'] = "Cita ReTeVe"
+        message['From'] = remitente
+        message['To'] = destinatario
+        message.attach(MIMEText(f"Se notifica cita para la fecha {fecha[0:8]} a las {fecha[8:10]}:{fecha[10:12]}"))
+        correo.send_message(message)
+        print(f"Correo enviado correctamente a {destinatario}")
+    except:
+        print("Error al enviar el correo")
+        
 def programar_citas():
     programador = iniciar_arbol()
     
@@ -183,6 +207,7 @@ def programar_citas():
             
             programador.agregar_nodo(tipo, placa, vehiculo, marca, modelo, propietario, telefono, correo, direccion, hora_cita)
             guardar_arbol(programador)
+            enviar_correo(correo, hora_cita)
             MessageBox.showinfo("Cita programada", "La cita ha sido programada exitosamente")
             window.destroy()
         
