@@ -50,7 +50,7 @@ def main(ventana):
     boton_configuracion = Button(ventana, text="Configuración del sistema", command=configuracion, bg="#CFC9F2", height=2, width=30)
     boton_configuracion.place(relx= 0.5, y = 450, anchor=N)
     
-    boton_ayuda = Button(ventana, text="Ayuda", command=lambda: print("Ayuda"), bg="#0A6AA6", height=2, width=30)
+    boton_ayuda = Button(ventana, text="Ayuda", command= lambda: os.system("assets\manual.pdf"), bg="#0A6AA6", height=2, width=30)
     boton_ayuda.place(relx= 0.5, y = 500, anchor=N)
     
     boton_acerca_de = Button(ventana, text="Acerca de", command=acerca_de, bg="#0D7BA6", height=2, width=30)
