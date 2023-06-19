@@ -72,7 +72,21 @@ def fallas_citas():
     def delete():
         cargar()
         if MessageBox.askyesno("Eliminar", "¿Desea eliminar la falla?"):
-            pass
+            for n in range(programador.cantidad_citas):
+                try:
+                    if int(llave_entry.get()) in programador.consultar_nodo(n).datos['fallas']:
+                        return MessageBox.showerror("Error", "La falla está siendo utilizada en una cita")
+                except:
+                    pass
+            with open("modules/fallas.dat", "r") as file:
+                fallas = json.loads(file.read())
+            try:
+                fallas["leves"].pop(llave_entry.get())
+            except:
+                fallas['graves'].pop(llave_entry.get())
+            with open("modules/fallas.dat", "w") as file:
+                file.write(json.dumps(fallas))
+            return MessageBox.showinfo("Falla eliminada", "La falla ha sido eliminada")
         else:
             return
     
