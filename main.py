@@ -7,6 +7,7 @@ import os
 from modules.programar_citas import programar_citas
 from modules.configuracion import configuracion
 from modules.cancelar_citas import cancelar_citas
+from modules.ingreso_citas import ingreso_citas
 
 # Funcion acerca de
 def acerca_de():
@@ -35,7 +36,7 @@ def main(ventana):
     boton_cancelar = Button(ventana, text="Cancelar citas", command=cancelar_citas, bg="#0A6AA6", height=2, width=30)
     boton_cancelar.place(relx= 0.5, y = 250, anchor=N)
     
-    boton_ingreso = Button(ventana, text="Ingreso de vehículos a la estación", command=lambda: print("Ingreso de vehículos a la estación"), bg="#0D7BA6", height=2, width=30)
+    boton_ingreso = Button(ventana, text="Ingreso de vehículos a la estación", command=ingreso_citas, bg="#0D7BA6", height=2, width=30)
     boton_ingreso.place(relx= 0.5, y = 300, anchor=N)
     
     boton_tablero = Button(ventana, text="Tablero de revisión", command=lambda: print("Tablero de revisión"), bg="#91F2F2", height=2, width=30)
