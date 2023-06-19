@@ -9,6 +9,7 @@ from modules.configuracion import configuracion
 from modules.cancelar_citas import cancelar_citas
 from modules.ingreso_citas import ingreso_citas
 from modules.tableros_citas import tablero_citas
+from modules.fallas_citas import fallas_citas
 
 # Funcion acerca de
 def acerca_de():
@@ -43,7 +44,7 @@ def main(ventana):
     boton_tablero = Button(ventana, text="Tablero de revisión", command=tablero_citas, bg="#91F2F2", height=2, width=30)
     boton_tablero.place(relx= 0.5, y = 350, anchor=N)
     
-    boton_lista = Button(ventana, text="Lista de fallas", command=lambda: print("Lista de fallas"), bg="#0D7BA6", height=2, width=30)
+    boton_lista = Button(ventana, text="Lista de fallas", command=fallas_citas, bg="#0D7BA6", height=2, width=30)
     boton_lista.place(relx= 0.5, y = 400, anchor=N)
     
     boton_configuracion = Button(ventana, text="Configuración del sistema", command=configuracion, bg="#CFC9F2", height=2, width=30)
