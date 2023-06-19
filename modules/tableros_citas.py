@@ -4,7 +4,39 @@ import tkinter as tk
 from tkinter import messagebox as MessageBox
 from datetime import datetime
 from modules.abb import *
+import os
 import json
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import PageBreak
+import smtplib
+from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
+
+# Función que envia el archivo que se le indique al correo que se le indique
+# Entradas: file_path, destinatario
+# Salidas: ninguna (envia un correo con el archivo que se le indique)
+def enviar_correo(file_path, destinatario):
+    remitente = "sistemaatletismo@gmail.com"
+    mail_password = "ckjrjpoimpgdxroq"
+    try:
+        correo = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        correo.login(remitente, mail_password)
+        message = MIMEMultipart()
+        message['Subject'] = "ReTeVe - Reporte de cita"
+        message['From'] = remitente
+        message['To'] = destinatario
+        with open(f"{os.getcwd()}/{file_path}", "rb") as attachment:
+            attach = MIMEApplication(attachment.read(), _subtype='pdf')
+        attach.add_header('Content-Disposition','attachment',filename="Reporte.pdf")
+        message.attach(attach)
+        correo.send_message(message)
+        print(f"Correo enviado correctamente a {destinatario}")
+    except:
+        print("Error al enviar el correo")
 
 def tablero_citas():
     def rellenar_tablero(estaciones, tablero_labels):
@@ -108,7 +140,63 @@ def tablero_citas():
                         guardar_arbol(programador)
                         return MessageBox.showinfo("Exito", "Se ha registrado la falla")
         elif comando[0] == "F":
-            pass
+            def certificado(nodo):
+                reporte = canvas.Canvas("assets/certificado.pdf", pagesize=A4)
+                text = reporte.beginText(50, 50)
+                text.textLine("Certificado de transito")
+                text.textLine("Placa: " + str(nodo.datos['placa']))
+                text.textLine("Marca: " + str(nodo.datos['marca']))
+                text.textLine("Tipo: " + str(nodo.datos['tipo']))
+                text.textLine("Propietario: " + str(nodo.datos['propietario']))
+                text.textLine("Vigencia hasta: " + str(int(str(nodo.datos['fecha'])[:6]) + 100))
+                reporte.drawText(text)
+                reporte.save()
+
+            for linea in estaciones['revision']:
+                if len(estaciones['revision'][linea]["5"]) != 0 and str(estaciones['revision'][linea]["5"][1]) == placa_comando:
+                    num_cita = estaciones['revision'][linea]["5"][0]
+                    nodo_cita = programador.consultar_nodo(int(num_cita))
+                    try:
+                        fallas = nodo_cita.datos['fallas']
+                        tipos = [0, 0]
+                        with open("modules/fallas.json", "r") as file:
+                            fallas_json = json.load(file)
+                        leves = fallas_json['leves'].keys()
+                        graves = fallas_json['graves'].keys()
+                        for falla in fallas:
+                            if falla in leves:
+                                tipos = [tipos[0] + 1, tipos[1]]
+                            elif falla in graves:
+                                tipos = [tipos[0], tipos[1] + 1]
+                        if tipos[1] == 0:
+                            nodo_cita.datos['estado'] = 'APROBADA'
+                            certificado(nodo_cita)
+                        elif tipos[1] < int(configuracion['fallas_graves_maximo']):
+                            nodo_cita.datos['estado'] = 'REINSPECCIÓN'
+                        elif tipos[1] >= int(configuracion['fallas_graves_maximo']):
+                            nodo_cita.datos['estado'] = 'SACAR DE CIRCULACIÓN'
+                            
+                    except:
+                        nodo_cita.datos['estado'] = 'APROBADA'
+                        certificado(nodo_cita)
+                    guardar_arbol(programador)
+            reporte = canvas.Canvas("assets/current.pdf", pagesize=A4)
+            text = reporte.beginText(50, 50)
+            text.textLine("Certificado de revisión")
+            text.textLine("Placa: " + placa_comando)
+            text.textLine("Fecha: " + fecha_actual.strftime("%d/%m/%Y"))
+            text.textLine("Hora: " + fecha_actual.strftime("%H:%M:%S"))
+            text.textLine("Estado: " + nodo_cita.datos['estado'])
+            text.textLine("Fallas: ")
+            try:
+                for n in nodo_cita.datos['fallas']:
+                    text.textLine("    " + str(n))
+            except:
+                text.textLine("    Ninguna")
+            reporte.drawText(text)
+            reporte.save()
+            enviar_correo(nodo_cita.datos['correo'], "assets/current.pdf")
+            return MessageBox.showinfo("Exito", "Se ha enviado el certificado al correo del propietario")
         elif comando[0] == "R":
             guardar_arbol(programador)
             guardar_estaciones(estaciones)
