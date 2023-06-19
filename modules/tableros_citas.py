@@ -91,7 +91,22 @@ def tablero_citas():
                             return MessageBox.showerror("Error", "No hay espacio suficiente para desplazar la placa")
             return MessageBox.showerror("Error", "La placa no existe en el tablero")
         elif comando[0] == "E":
-            pass
+            # Falta verificacion de que la falta exista
+            falla = comando[-4:]
+            placa_comando = placa_comando[:-4]
+            for linea in estaciones:
+                for puesto in estaciones[linea]['revision']:
+                    print(estaciones[linea]['revision'][puesto])
+                    if estaciones[linea]['revision'][puesto] != "" and str(estaciones[linea]['revision'][puesto][1]) == placa_comando:
+                        num_cita = estaciones[linea]['revision'][puesto][0]
+                        nodo_cita = programador.consultar_nodo(int(num_cita))
+                        try:
+                            nodo_cita.datos['fallas'].append(falla)
+                        except:
+                            nodo_cita.datos['fallas'] = []
+                            nodo_cita.datos['fallas'].append(falla)
+                        guardar_arbol(programador)
+                        return MessageBox.showinfo("Exito", "Se ha registrado la falla")
         elif comando[0] == "F":
             pass
         elif comando[0] == "R":
