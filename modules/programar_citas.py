@@ -3,7 +3,7 @@ from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox as MessageBox
 from verify_email import verify_email
-from datetime import datetime
+from datetime import datetime, timedelta
 from modules.abb import *
 
 def programar_citas():
@@ -15,6 +15,85 @@ def programar_citas():
         window = Tk()
         window.title("Programar cita")
         
+        # Maneja el horario manual
+        def horario_manual():
+            fecha_year_entry.config(state = NORMAL)
+            fecha_month_entry.config(state = NORMAL)
+            fecha_day_entry.config(state = NORMAL)
+            tiempo_hora_entry.config(state = NORMAL)
+            tiempo_minutos_entry.config(state = NORMAL)
+        
+        # Maneja el horario automatico
+        def horario_automatico():
+            fecha_year_entry.delete(0, END)
+            fecha_year_entry.config(state = DISABLED)
+            fecha_month_entry.delete(0, END)
+            fecha_month_entry.config(state = DISABLED)
+            fecha_day_entry.delete(0, END)
+            fecha_day_entry.config(state = DISABLED)
+            tiempo_hora_entry.delete(0, END)
+            tiempo_hora_entry.config(state = DISABLED)
+            tiempo_minutos_entry.delete(0, END)
+            tiempo_minutos_entry.config(state = DISABLED)
+            with open("modules/configuracion.dat", "r") as file:
+                configuracion = json.loads(file.read())
+            fecha_actual = datetime.now()
+            fecha_max = fecha_actual + timedelta(days = int(configuracion["cantidad_meses_citas"]) * 31)
+            fecha_ventana = Toplevel()
+            fecha_ventana.title("Seleccionar fecha")
+            fecha_ventana.geometry("300x300")
+            fecha_ventana.minsize(300, 300)
+            fecha_ventana.maxsize(300, 300)
+            def seleccionar_hora(fecha):
+                def guardar_hora():
+                    hora = menu_eleccion.get()
+                    tiempo_hora_entry.config(state = NORMAL)
+                    tiempo_minutos_entry.config(state = NORMAL)
+                    tiempo_hora_entry.insert(0, hora[:2])
+                    tiempo_minutos_entry.insert(0, hora[-2:])
+                    tiempo_hora_entry.config(state = DISABLED)
+                    tiempo_minutos_entry.config(state = DISABLED)
+                    hora_ventana.destroy()
+                hora_ventana = Toplevel()
+                hora_ventana.title("Seleccionar hora")
+                hora_ventana.geometry("300x300")
+                hora_ventana.minsize(300, 300)
+                hora_ventana.maxsize(300, 300)
+                fecha = datetime.strptime(fecha, "%d/%m/%Y")
+                fecha = fecha.replace(hour=int(configuracion['hora_inicio']), minute=0, second=0, microsecond=0)
+                opciones = []
+                while True:
+                    if fecha.hour == int(configuracion['hora_final']):
+                        break
+                    opciones.append(fecha.strftime("%H:%M"))
+                    if fecha.minute + int(configuracion['minutos_revision']) > 59:
+                        fecha = fecha.replace(hour = fecha.hour + 1, minute = 60 - (fecha.minute + int(configuracion['minutos_revision'])))
+                    else:
+                        fecha = fecha.replace(minute = fecha.minute + int(configuracion['minutos_revision']))
+                menu_eleccion = ttk.Combobox(hora_ventana, values = opciones)
+                menu_eleccion.place(x = 50, y = 50)
+                guardar_hora_button = Button(hora_ventana, text = "Guardar hora", command = guardar_hora)
+                guardar_hora_button.place(x = 50, y = 100)
+                
+            menu_eleccion = ttk.Combobox(fecha_ventana, values = [(fecha_actual + timedelta(days=n)).strftime("%d/%m/%Y") for n in range(int(configuracion["cantidad_meses_citas"]) * 31)])
+            menu_eleccion.place(x = 50, y = 50)
+            def seleccionar_fecha():
+                fecha_elegida = menu_eleccion.get()
+                fecha_year_entry.config(state = NORMAL)
+                fecha_month_entry.config(state = NORMAL)
+                fecha_day_entry.config(state = NORMAL)
+                fecha_year_entry.insert(0, fecha_elegida[-4:])
+                fecha_month_entry.insert(0, fecha_elegida[3:5])
+                fecha_day_entry.insert(0, fecha_elegida[:2])
+                fecha_year_entry.config(state = DISABLED)
+                fecha_month_entry.config(state = DISABLED)
+                fecha_day_entry.config(state = DISABLED)
+                fecha_ventana.destroy()
+                seleccionar_hora(fecha_elegida)
+                
+            
+            seleccionar_boton = Button(fecha_ventana, text = "Seleccionar fecha", command = seleccionar_fecha)
+            seleccionar_boton.place(x = 50, y = 100)
         # Funcion para enviar la cita
         def enviar_cita():
             tipo = tipo_cita_checkbutton.get()
@@ -148,10 +227,9 @@ def programar_citas():
         direccion_label = Label(window, text="Direccion")
         direccion_entry = Entry(window)
         
-        tipo_horario_var = IntVar()
         tipo_horario_label = Label(window, text="Tipo de horario")
-        tipo_horario_manual = Radiobutton(window, text="Manual", variable=tipo_horario_var, value=0)
-        tipo_horario_automatica = Radiobutton(window, text="Automatica", variable=tipo_horario_var, value=1)
+        tipo_horario_manual = Button(window, text="Manual", command=horario_manual)
+        tipo_horario_automatica = Button(window, text="Automatica", command=horario_automatico)
         
         fecha_label = Label(window, text="Fecha")
         fecha_year_entry = Entry(window, width=5)
