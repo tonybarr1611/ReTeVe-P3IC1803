@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox as MessageBox
 from datetime import datetime
 from modules.abb import *
+import json
 
 def ingreso_citas():
     def ingresar():
