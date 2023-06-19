@@ -44,6 +44,10 @@ def ingreso_citas():
             for linea in estaciones[estacion]["espera"]:
                 if estaciones[estacion]["espera"][linea][0] == cita:
                     return MessageBox.showerror("Error", "La cita ya se encuentra en la estacion " + estacion)
+            for linea in estaciones[estacion]["revision"]:
+                if estaciones[estacion]["revision"][linea][0] == cita:
+                    return MessageBox.showerror("Error", "La cita ya se encuentra en la estacion " + estacion)
+
             if min_linea == [0, 0]:
                 min_linea = [estacion, len(estaciones[estacion]["espera"])]
             elif len(estaciones[estacion]["espera"]) < min_linea[1]:
